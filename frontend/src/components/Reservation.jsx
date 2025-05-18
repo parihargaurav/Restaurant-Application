@@ -51,7 +51,7 @@ const Reservation = () => {
         <div className="banner">
           <div className="reservation_form_box">
             <h1>MAKE A RESERVATION</h1>
-            <p>For Further Questions, Please Call</p>
+            <p>Book Your Table Now 📍</p>
             <form onSubmit={handleReservation}> {/* ✅ Fix: Use onSubmit instead of onClick */}
               <div>
                 <input
