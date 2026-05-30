@@ -1,127 +1,128 @@
 # 🍽️ DineEase
-Smart Restaurant Reservation & Payment Platform
+A production-ready restaurant reservation platform with secure Google login, Stripe payments, and modular backend services.
 
-DineEase is a full-stack restaurant reservation and payment web application that allows users to seamlessly reserve tables and complete secure online payments.
-Built with React.js, Node.js, Express.js, MongoDB, and Stripe, the platform delivers a modern, secure, and user-friendly dining reservation experience.
+## Overview
+DineEase is a full-stack restaurant booking application built with React, Express, MongoDB, and Stripe. It supports authenticated table reservations, server-side payment processing, and confirmation email delivery.
 
-🚀 Key Features
-📅 Table Reservation System
+This README highlights the project architecture, backend service modules, and recent enhancements so that reviewers on LinkedIn can quickly understand the design and capabilities.
 
-Reserve tables by selecting date, time, and number of guests
+## What makes this project production-level?
+- ✅ Modular backend service design: authentication, reservation, payment, and email layers are separated into dedicated controllers, routes, and middleware.
+- ✅ Google OAuth login with JWT-based protection for API access.
+- ✅ Server-side Stripe payment intent creation and payment verification to avoid trusting client price data.
+- ✅ Authenticated reservation creation tied to user identity.
+- ✅ Email confirmation service for booking receipts.
+- ✅ Strong frontend UX with state persistence, notifications, and responsive form handling.
+- ✅ Centralized error handling and CORS configuration.
 
-Prevents duplicate and invalid reservations
+## Backend Service Architecture
+The backend is organized into logical service modules that behave like microservices internally:
 
-Clean, intuitive, and user-friendly booking flow
+### 1. Authentication Service (`auth`)
+- Endpoint: `POST /api/v1/auth/google`
+- Validates Google ID tokens using `google-auth-library`
+- Creates or upserts users in MongoDB
+- Issues JWT tokens with a 7-day expiry
+- Stores user session details safely in local storage on the frontend
 
-💳 Secure Online Payments (Stripe)
+### 2. Reservation Service (`reservation`)
+- Endpoint: `POST /api/v1/reservation/send`
+- Requires authentication middleware (`isAuthenticated`)
+- Validates reservation fields and enforces required booking data
+- Calculates trusted table pricing server-side
+- Saves reservations with `paymentStatus: pending`
+- Returns `reservationId` for the payment flow
 
-Integrated Stripe Payment Gateway
+### 3. Payment Service (`payments`)
+- Endpoint: `POST /api/v1/payments/create-payment-intent`
+- Endpoint: `POST /api/v1/payments/confirm`
+- Creates Stripe Payment Intents using trusted server-side reservation pricing
+- Verifies payment status by fetching the Stripe intent before marking booking as paid
+- Persists payment records and updates reservation status to `paid`
 
-Supports card payments in test & secure mode
+### 4. Email Notification Service (`emailService`)
+- Uses `resend` for transactional email delivery
+- Sends an elegant booking confirmation email after successful payment
+- Operates asynchronously so the API response is not blocked by email delivery
+- Includes receipt details: guest name, date, time, table, total paid, and payment reference
 
-Backend-validated payment confirmation
+## Recent Frontend Enhancements
+- Auto-fills the reservation email field from the authenticated user profile
+- Ensures fields like email, date, and time render correctly in dark mode
+- Uses Google login button for authentication in the reservation flow
+- Protects booking and payment actions behind valid JWT tokens
+- Provides toast notifications for errors, success, and flow feedback
+- Offers responsive reservation UI with table selection and price preview
 
-Reservation is confirmed only after successful payment
+## User Workflow
+1. User logs in with Google
+2. User selects table type, date, time, and enters booking details
+3. Backend creates a reservation and returns a reservation ID
+4. Frontend requests a Stripe Payment Intent based on reservation price
+5. User completes payment through Stripe Elements
+6. Backend verifies payment status, saves payment record, and marks reservation as paid
+7. Booking confirmation email is triggered automatically
 
-📋 Dynamic Restaurant Menu
+## Key Technologies
+- Frontend: React, React Router, Axios, React Hot Toast, Stripe Elements
+- Backend: Node.js, Express, MongoDB, Mongoose, Stripe, JSON Web Tokens
+- Authentication: Google OAuth, JWT
+- Email: Resend transactional email service
+- Deployment-ready practices: environment-based configuration, CORS, centralized error handling
 
-Displays popular dishes with well-structured categories
-
-Fully responsive layout for all screen sizes
-
-Optimized UI for a smooth browsing experience
-
-⏱️ Smart Redirect & UX Enhancements
-
-Countdown-based redirect after successful payment
-
-Toast notifications for real-time user feedback
-
-Graceful handling of invalid or expired reservation/payment states
-
-🔗 Robust Frontend–Backend Communication
-
-RESTful APIs using Express.js
-
-Axios for clean and efficient data exchange
-
-Centralized error handling for better reliability
-
-🛠️ Tech Stack
-🎨 Frontend (Client-Side)
-
-React.js – Component-based UI architecture
-
-React Router – Client-side routing
-
-CSS / Tailwind (if applicable) – Responsive & modern styling
-
-React Hot Toast – Instant user notifications
-
-@stripe/react-stripe-js – Stripe payment integration
-
-🔧 Backend (Server-Side)
-
-Node.js – JavaScript runtime
-
-Express.js – REST API framework
-
-MongoDB & Mongoose – Database & schema modeling
-
-Stripe API – Secure payment processing
-
-dotenv – Environment variable management
-
-CORS – Secure cross-origin handling
-
-🔐 Payment Flow (Stripe Integration)
-
-User fills in table reservation details
-
-Backend creates a Stripe Payment Intent
-
-Frontend confirms payment using Stripe Elements
-
-Reservation is finalized only after successful payment
-
-User receives instant confirmation via UI feedback
-
-✔ No sensitive card data stored
-✔ Stripe handles PCI compliance
-✔ Secure, scalable, and production-ready flow
-
-📂 Project Architecture
+## Project Structure
+```
 DineEase/
-├── frontend/   # React UI + Stripe Elements
-└── backend/    # Express APIs + MongoDB + Stripe
+├── backend/                  # Express API, controllers, models, routes, middleware
+│   ├── controller/           # Business logic and service handlers
+│   ├── middlewares/          # Auth and error handling
+│   ├── models/               # MongoDB schema definitions
+│   ├── routes/               # API route definitions
+│   ├── services/             # Email and utility services
+│   └── server.js             # Entry point
+└── frontend/                 # React UI and Stripe frontend flow
+```
 
-🌟 Why DineEase Stands Out
+## Environment Variables
+Create a `.env` file for the backend with values such as:
+- `PORT`
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `GOOGLE_CLIENT_ID`
+- `STRIPE_SECRET_KEY`
+- `FRONTEND_URL`
+- `RESEND_API_KEY`
 
-Industry-standard Stripe payment integration
+Frontend should have an `.env` like:
+- `VITE_API_URL`
 
-Secure backend validation for reservations & payments
+## Installation
+```bash
+# Backend
+cd backend
+npm install
+npm run dev
 
-Clean UX with real-time feedback
+# Frontend
+cd frontend
+npm install
+npm run dev
+```
 
-Scalable full-stack architecture
+## Notes for Reviewers
+This project is built with a production mindset:
+- Backend service modules are separated and reusable
+- Authentication is secure and token-based
+- Payment flow avoids client-side price tampering
+- Email notifications are decoupled from the main response cycle
+- UX improvements are made with real form handling and validation
 
-Production-ready coding practices
+If you are reviewing this on LinkedIn, the key strengths are:
+- Microservice-style backend separation
+- Secure third-party integrations with Google and Stripe
+- Real-world reservation and payment lifecycle
+- Clear, modular code structure ready for scaling
 
-📌 Future Enhancements
+---
 
-Stripe Webhook integration for real payment verification
-
-Admin dashboard for reservations & payments
-
-Email/SMS confirmation notifications
-
-Multi-restaurant support
-
-🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-Feel free to fork the repository and submit a pull request.
-
-📄 License
-
-This project is for learning and portfolio purposes.
+If you'd like, I can also add a short “Project Highlights” section especially for LinkedIn posts.  
