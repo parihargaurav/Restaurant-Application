@@ -18,10 +18,10 @@ const app = express();
 // ✅ Allow CORS for Frontend
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL?.replace(/\/$/, ""), // Remove trailing slash
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Ensure OPTIONS is allowed
+    origin: process.env.FRONTEND_URL?.replace(/\/$/, ""), 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Allow necessary headers
+    allowedHeaders: ["Content-Type", "Authorization"], 
   })
 );
 
@@ -62,10 +62,8 @@ dbConnection();
 // ✅ Error Handling Middleware
 app.use(errorMiddleware);
 
-/* =======================
-   Server Start
-======================= */
-const PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT ;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server started on port ${PORT}`);
