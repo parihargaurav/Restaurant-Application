@@ -125,4 +125,3 @@ If you are reviewing this on LinkedIn, the key strengths are:
 
 ---
 
-If you'd like, I can also add a short “Project Highlights” section especially for LinkedIn posts.  
